@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
-import subprocess
 
 # Load the dataset from GitHub
 data_url = 'https://github.com/was-im/streamlit-example/blob/master/adc.csv'
