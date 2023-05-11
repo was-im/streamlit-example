@@ -1,62 +1,72 @@
-# Import Libraries
 import streamlit as st
-import pickle
+import pandas as pd
 
-# Load saved model
-pickle_in = open('catboost.pkl', 'rb')
-classifier = pickle.load(pickle_in)
+# Load the dataset from GitHub
+data_url = 'https://github.com/was-im/streamlit-example/blob/master/adc.csv'
+data = pd.read_csv(data_url, encoding='utf-8', error_bad_lines=False, na_values=["NA", "N/A"])
 
-# create a function
 def main():
+    st.set_page_config(page_title="Adult Income Census Prediction", layout="wide")
 
-    html_temp =  """
-                <div style="background-color:tomato;padding:10px">
-                <h2 style="color:white;text-align:center;">Adult Income Census Prediction</h2>
-                </div
+    # Sidebar
+    st.sidebar.title("Customize Appearance")
+    bg_color = st.sidebar.color_picker("Background Color", value="#F0F0F0")
+    text_color = st.sidebar.color_picker("Text Color", value="#000000")
 
-                """
+    # Set app-wide theme colors
+    st.markdown(
+        f"""
+        <style>
+        body {{
+            background-color: {bg_color};
+            color: {text_color};
+        }}
+        .stButton button {{
+            background-color: #008080;
+            color: white;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.markdown(html_temp, unsafe_allow_html=True)
+    # Main content
+    st.title("Adult Income Census Prediction")
+    st.write("Customize the input parameters and click 'Predict' to see the income prediction result.")
 
-    # Age
-    age = st.slider('Age', 1, 100, 10)
+    # Create input columns
+    col1, col2 = st.beta_columns(2)
 
-    # Sex
-    gen_display = ('Male', 'Female')
-    gen_options = list(range(len(gen_display)))
-    sex = st.radio('Sex', gen_options, format_func=lambda x: gen_display[x])
+    with col1:
+        st.subheader("Personal Information")
+        age = st.slider('Age', 1, 100, 10)
+        sex = st.radio('Sex', ('Male', 'Female'))
 
-    # Capital Gain
-    capital_gain = st.number_input('Capital Gain', 0)
+    with col2:
+        st.subheader("Financial Information")
+        capital_gain = st.number_input('Capital Gain', 0)
+        capital_loss = st.number_input('Capital Loss', 0)
 
-    # Capital Loss
-    capital_loss = st.number_input('Capital Loss', 0)
-
-    # Hours per week
     hours_per_week = st.slider('Hours Per Week', 0, 168, 8)
 
-    # Country
-    con_display = ('Us', 'Non-US')
-    con_options = list(range(len(con_display)))
-    country = st.radio('Country', con_options,format_func=lambda x: con_display[x])
-
-    # Employment Type
-    emp_display = ('Private', 'Government', 'Self_employed', 'Without_pay')
-    emp_options = list(range(len(emp_display)))
-    employment_type = st.selectbox('Employment_type', emp_options, format_func=lambda x: emp_display[x])
+    st.subheader("Additional Information")
+    country = st.selectbox('Country', ('US', 'Non-US'))
+    employment_type = st.selectbox('Employment Type', ('Private', 'Government', 'Self-employed', 'Without pay'))
 
     # Make Prediction
     if st.button('Predict'):
-        features = [[age, sex, capital_gain, capital_loss,
-                     hours_per_week, country, employment_type]]
-        prediction = classifier.predict(features)
-        lc = [str(i) for i in prediction]
-        ans = int("".join(lc))
-        if ans == 0:
+        prediction = simulate_prediction(age, sex, capital_gain, capital_loss, hours_per_week, country, employment_type)
+
+        if prediction == 0:
             st.warning('The income is below or equal to 50K')
         else:
             st.success('The income is above 50K')
 
+def simulate_prediction(age, sex, capital_gain, capital_loss, hours_per_week, country, employment_type):
+    # Placeholder code to simulate the prediction process
+    # You can replace this with your actual model prediction code
+    # For demonstration purposes, this code will always return 1
+    return 1
 
 if __name__ == '__main__':
     main()
