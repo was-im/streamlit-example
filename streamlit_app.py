@@ -1,12 +1,10 @@
 import streamlit as st
 import pandas as pd
-import subprocess
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
 
 # Install required packages
 subprocess.run(['pip', 'install', 'scikit-learn'])
-
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
 
 # Load the dataset from GitHub
 data_url = 'https://github.com/was-im/streamlit-example/blob/master/adc.csv'
