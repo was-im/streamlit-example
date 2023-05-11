@@ -10,7 +10,7 @@ from sklearn.preprocessing import LabelEncoder
 
 # Load the dataset from GitHub
 data_url = 'https://github.com/was-im/streamlit-example/blob/master/adc.csv'
-data = pd.read_csv(data_url, encoding='utf-8', error_bad_lines=False, na_values=["NA", "N/A"])
+data = pd.read_csv(data_url)
 
 # Select relevant columns
 selected_columns = ['age', 'sex', 'hours.per.week', 'native.country', 'workclass', 'capital.gain', 'capital.loss', 'income']
