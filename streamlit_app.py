@@ -1,15 +1,19 @@
 # Import Libraries
 import pandas as pd
 import streamlit as st
-from catboost import CatBoostClassifier
-import requests
+
+# Try importing CatBoost
+try:
+    from catboost import CatBoostClassifier
+    catboost_available = True
+except ImportError:
+    catboost_available = False
 
 # Dataset URL
 data_url = 'https://raw.githubusercontent.com/was-im/streamlit-example/master/adc.csv'
 
 # Download the dataset
-response = requests.get(data_url)
-data = pd.read_csv(pd.compat.StringIO(response.text))
+data = pd.read_csv(data_url)
 
 # Preprocess the dataset
 # Assuming you have already preprocessed the dataset, including handling missing values, encoding categorical variables, etc.
@@ -18,9 +22,10 @@ data = pd.read_csv(pd.compat.StringIO(response.text))
 X = data.drop('income', axis=1)
 y = data['income']
 
-# Train the CatBoost model
-model = CatBoostClassifier()
-model.fit(X, y)
+# Train the CatBoost model if available
+if catboost_available:
+    model = CatBoostClassifier()
+    model.fit(X, y)
 
 # create a function
 def main():
@@ -54,7 +59,7 @@ def main():
     employment_type = st.selectbox('Employment_type', ('Private', 'Government', 'Self_employed', 'Without_pay'))
 
     # Make Prediction
-    if st.button('Predict'):
+    if catboost_available and st.button('Predict'):
         features = [[age, sex, capital_gain, capital_loss,
                      hours_per_week, country, employment_type]]
         prediction = model.predict(features)[0]
@@ -62,6 +67,8 @@ def main():
             st.warning('The income is below or equal to 50K')
         else:
             st.success('The income is above 50K')
+    elif not catboost_available:
+        st.warning('CatBoost is not available. Please check your environment setup.')
 
 
 if __name__ == '__main__':
