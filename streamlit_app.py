@@ -1,66 +1,29 @@
 # Import Libraries
 import pandas as pd
-import streamlit as st
-from xgboost import XGBClassifier
-
-# Dataset URL
-data_url = 'https://raw.githubusercontent.com/was-im/streamlit-example/master/adc.csv'
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 # Load the dataset
-data = pd.read_csv(data_url)
-
-# Preprocess the dataset
-# Assuming you have already preprocessed the dataset, including handling missing values, encoding categorical variables, etc.
+data_url = 'https://raw.githubusercontent.com/was-im/streamlit-example/master/adc.csv'
+df = pd.read_csv(data_url)
 
 # Split the dataset into features and target variable
-X = data.drop('income', axis=1)
-y = data['income']
+X = df.drop('income', axis=1)
+y = df['income']
 
-# Train the XGBoost model
-model = XGBClassifier()
-model.fit(X, y)
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# create a function
-def main():
-    html_temp = """
-                <div style="background-color:tomato;padding:10px">
-                <h2 style="color:white;text-align:center;">Adult Income Census Prediction</h2>
-                </div>
-                """
+# Create a Random Forest Classifier
+model = RandomForestClassifier()
 
-    st.markdown(html_temp, unsafe_allow_html=True)
+# Train the model
+model.fit(X_train, y_train)
 
-    # Age
-    age = st.slider('Age', 1, 100, 10)
+# Make predictions on the test set
+y_pred = model.predict(X_test)
 
-    # Sex
-    sex = st.radio('Sex', ('Male', 'Female'))
-
-    # Capital Gain
-    capital_gain = st.number_input('Capital Gain', 0)
-
-    # Capital Loss
-    capital_loss = st.number_input('Capital Loss', 0)
-
-    # Hours per week
-    hours_per_week = st.slider('Hours Per Week', 0, 168, 8)
-
-    # Country
-    country = st.radio('Country', ('Us', 'Non-US'))
-
-    # Employment Type
-    employment_type = st.selectbox('Employment_type', ('Private', 'Government', 'Self_employed', 'Without_pay'))
-
-    # Make Prediction
-    if st.button('Predict'):
-        features = [[age, sex, capital_gain, capital_loss,
-                     hours_per_week, country, employment_type]]
-        prediction = model.predict(features)[0]
-        if prediction == 0:
-            st.warning('The income is below or equal to 50K')
-        else:
-            st.success('The income is above 50K')
-
-
-if __name__ == '__main__':
-    main()
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
