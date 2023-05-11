@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+import subprocess
 
 # Install required packages
 subprocess.run(['pip', 'install', 'scikit-learn'])
@@ -53,8 +54,8 @@ def main():
     st.subheader("Additional Information")
     country = st.selectbox('Country', data['native.country'].unique())
     employment_type = st.selectbox('Employment Type', data['workclass'].unique())
-
-    # Make Prediction
+    
+        # Make Prediction
     if st.button('Predict'):
         prediction = simulate_prediction(age, sex, capital_gain, capital_loss, hours_per_week, country, employment_type)
 
