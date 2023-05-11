@@ -1,89 +1,68 @@
-import streamlit as st
+# Import Libraries
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
+import streamlit as st
+from catboost import CatBoostClassifier
 import requests
-from io import StringIO
 
-# Load the dataset from GitHub
-data_url = 'https://github.com/was-im/streamlit-example/blob/master/adc.csv'
+# Dataset URL
+data_url = 'https://raw.githubusercontent.com/was-im/streamlit-example/master/adc.csv'
+
+# Download the dataset
 response = requests.get(data_url)
-data = pd.read_csv(StringIO(response.text), encoding='utf-8', error_bad_lines=False, na_values=["NA", "N/A"])
+data = pd.read_csv(pd.compat.StringIO(response.text))
 
-# Select relevant columns
-selected_columns = ['age', 'sex', 'hours.per.week', 'native.country', 'workclass', 'capital.gain', 'capital.loss', 'income']
-data = data[selected_columns]
+# Preprocess the dataset
+# Assuming you have already preprocessed the dataset, including handling missing values, encoding categorical variables, etc.
 
-# Convert categorical variables to numerical using label encoding
-label_encoder = LabelEncoder()
-data['sex'] = label_encoder.fit_transform(data['sex'])
-data['native.country'] = label_encoder.fit_transform(data['native.country'])
-data['workclass'] = label_encoder.fit_transform(data['workclass'])
-
-# Split the data into features (X) and target (y)
+# Split the dataset into features and target variable
 X = data.drop('income', axis=1)
 y = data['income']
 
-# Train a Random Forest classifier
-clf = RandomForestClassifier(random_state=42)
-clf.fit(X, y)
+# Train the CatBoost model
+model = CatBoostClassifier()
+model.fit(X, y)
 
+# create a function
 def main():
-    st.set_page_config(page_title="Adult Income Census Prediction", layout="wide")
-   
-    # Main content
-    st.title("Adult Income Census Prediction")
-    st.write("Customize the input parameters and click 'Predict' to see the income prediction result.")
+    html_temp = """
+                <div style="background-color:tomato;padding:10px">
+                <h2 style="color:white;text-align:center;">Adult Income Census Prediction</h2>
+                </div>
+                """
 
-    # Create input columns
-    col1, col2 = st.beta_columns(2)
+    st.markdown(html_temp, unsafe_allow_html=True)
 
-    with col1:
-        st.subheader("Personal Information")
-        age = st.slider('Age', 18, 100, 10)
-        sex = st.radio('Sex', ('Male', 'Female'))
+    # Age
+    age = st.slider('Age', 1, 100, 10)
 
-    with col2:
-        st.subheader("Financial Information")
-        capital_gain = st.number_input('Capital Gain', 0)
-        capital_loss = st.number_input('Capital Loss', 0)
+    # Sex
+    sex = st.radio('Sex', ('Male', 'Female'))
 
-    hours_per_week = st.slider('Hours Per Week', 0, 80, 8)
+    # Capital Gain
+    capital_gain = st.number_input('Capital Gain', 0)
 
-    st.subheader("Additional Information")
-    country = st.selectbox('Country', data['native.country'].unique())
-    employment_type = st.selectbox('Employment Type', data['workclass'].unique())
+    # Capital Loss
+    capital_loss = st.number_input('Capital Loss', 0)
+
+    # Hours per week
+    hours_per_week = st.slider('Hours Per Week', 0, 168, 8)
+
+    # Country
+    country = st.radio('Country', ('Us', 'Non-US'))
+
+    # Employment Type
+    employment_type = st.selectbox('Employment_type', ('Private', 'Government', 'Self_employed', 'Without_pay'))
 
     # Make Prediction
     if st.button('Predict'):
-        prediction = simulate_prediction(age, sex, capital_gain, capital_loss, hours_per_week, country, employment_type)
-
+        features = [[age, sex, capital_gain, capital_loss,
+                     hours_per_week, country, employment_type]]
+        prediction = model.predict(features)[0]
         if prediction == 0:
             st.warning('The income is below or equal to 50K')
         else:
             st.success('The income is above 50K')
 
-def simulate_prediction(age, sex, capital_gain, capital_loss, hours_per_week, country, employment_type):
-    # Prepare user input for prediction
-    user_input = pd.DataFrame({
-        'age': [age],
-        'sex': [sex],
-        'hours.per.week': [hours_per_week],
-        'native.country': [country],
-        'workclass': [employment_type],
-        'capital.gain': [capital_gain],
-        'capital.loss': [capital_loss]
-    })
-
-    # Convert categorical variables to numerical
-    user_input['sex'] = label_encoder.transform(user_input['sex'])
-    user_input['native.country'] = label_encoder.transform(user_input['native.country'])
-    user_input['workclass'] = label_encoder.transform(user_input['workclass'])
-
-    # Make a prediction using the trained model
-    prediction = clf.predict(user_input)[0]
-
-    return prediction
 
 if __name__ == '__main__':
     main()
