@@ -1,17 +1,13 @@
 # Import Libraries
 import pandas as pd
 import streamlit as st
-from catboost import CatBoostClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 # Dataset URL
 data_url = 'https://raw.githubusercontent.com/was-im/streamlit-example/master/adc.csv'
 
 # Load the dataset
-try:
-    data = pd.read_csv(data_url)
-except Exception as e:
-    st.error(f"Error loading the dataset: {str(e)}")
-    st.stop()
+data = pd.read_csv(data_url)
 
 # Preprocess the dataset
 # Assuming you have already preprocessed the dataset, including handling missing values, encoding categorical variables, etc.
@@ -20,8 +16,8 @@ except Exception as e:
 X = data.drop('income', axis=1)
 y = data['income']
 
-# Train the CatBoost model
-model = CatBoostClassifier()
+# Train the Random Forest model
+model = RandomForestClassifier()
 model.fit(X, y)
 
 # create a function
