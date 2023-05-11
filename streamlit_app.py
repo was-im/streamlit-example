@@ -4,7 +4,7 @@ import pandas as pd
 
 # Load the dataset from GitHub
 data_url = 'https://github.com/was-im/streamlit-example/blob/master/adc.csv'
-data = pd.read_csv(data_url, encoding='utf-8', error_bad_lines=False, na_values=["NA", "N/A"])
+data = pd.read_csv(data_url, encoding='utf-8', error_bad_lines=False, na_values=None)
 
 def main():
     st.set_page_config(page_title="Adult Income Census Prediction", layout="wide")
