@@ -4,9 +4,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import subprocess
 
-# Install required packages
-subprocess.run(['pip', 'install', 'scikit-learn'])
-
 # Load the dataset from GitHub
 data_url = 'https://github.com/was-im/streamlit-example/blob/master/adc.csv'
 data = pd.read_csv(data_url, encoding='utf-8', error_bad_lines=False)
