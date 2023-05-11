@@ -1,7 +1,7 @@
 # Import Libraries
 import pandas as pd
 import streamlit as st
-from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 
 # Dataset URL
 data_url = 'https://raw.githubusercontent.com/was-im/streamlit-example/master/adc.csv'
@@ -16,8 +16,8 @@ data = pd.read_csv(data_url)
 X = data.drop('income', axis=1)
 y = data['income']
 
-# Train the Random Forest model
-model = RandomForestClassifier()
+# Train the XGBoost model
+model = XGBClassifier()
 model.fit(X, y)
 
 # create a function
